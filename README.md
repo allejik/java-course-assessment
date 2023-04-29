@@ -11,6 +11,4 @@
 5. Создайте класс (например MyStatistics) который реализует интерфейс <b>Statistics</b> с помощью ключевого слова <b>implements</b> и установите в него ранее подсчитанные значения
 <br><br>
 6. Используйте следующий код для создания <b>stats.json</b> файла со статистикой:<br>
-<code>
-   fileHelper.writeStatistics(<i>ОБЪЕКТ_СТАТИСТИКИ</i>);
-</code>
+<code>fileHelper.writeStatistics(<i>ОБЪЕКТ_СТАТИСТИКИ</i>);</code>
