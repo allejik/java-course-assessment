@@ -4,34 +4,34 @@ package org.example;
 class Voter {
 
     // Кандидат за которого проголосовал избиратель
-    String candidateName;
+    private String candidateName;
 
     // Возраст избирателя
-    Integer age;
+    private Integer age;
 
     // Пол избирателя
-    String gender;
+    private String gender;
 
     // Город в котором живет избиратель
-    String residence;
+    private String residence;
 
     // Получить имя кандидата за которого проголосовал избиратель
-    String getCandidateName() {
+    public String getCandidateName() {
         return candidateName;
     }
 
     // Получить возраст избирателя
-    Integer getAge() {
+    public Integer getAge() {
         return age;
     }
 
     // Получить пол избирателя
-    String getGender() {
+    public String getGender() {
         return gender;
     }
 
     // Получить город в котором живет избиратель
-    String getResidence() {
+    public String getResidence() {
         return residence;
     }
 }
