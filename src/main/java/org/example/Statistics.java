@@ -13,4 +13,3 @@ interface Statistics {
 
     Map<String, Integer> getVoterResidence();
 }
-
