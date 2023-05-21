@@ -1,12 +1,11 @@
 package org.bundestag;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.example.Statistics;
-import org.example.StatisticsImpl;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -26,12 +25,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class VotesViewerApp extends ApplicationFrame {
 
     private JPanel chartsPanel;
+
+    private GridLayout chartsLayout;
 
     /**
      * Constructs a new application frame.
@@ -46,11 +48,11 @@ public class VotesViewerApp extends ApplicationFrame {
         setLocationRelativeTo(null);
     }
 
-    private PieDataset createVotesDataSet(Statistics statistics) {
+    private PieDataset createVotesDataSet(Stats statistics) {
         DefaultPieDataset dataset = new DefaultPieDataset();
-        if (statistics.getCandidateVotes() != null) {
-            for (String candidateName : statistics.getCandidateVotes().keySet()) {
-                Integer votes = statistics.getCandidateVotes().get(candidateName);
+        if (statistics.getVotes() != null) {
+            for (String candidateName : statistics.getVotes().keySet()) {
+                Integer votes = statistics.getVotes().get(candidateName);
                 dataset.setValue(candidateName, votes);
             }
         }
@@ -81,11 +83,11 @@ public class VotesViewerApp extends ApplicationFrame {
     }
 
 
-    private CategoryDataset createGenderDataSet(Statistics statistics) {
+    private CategoryDataset createGenderDataSet(Stats statistics) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        if (statistics.getVoterGender() != null) {
-            for (String voterGender : statistics.getVoterGender().keySet()) {
-                Integer amount = statistics.getVoterGender().get(voterGender);
+        if (statistics.getGender() != null) {
+            for (String voterGender : statistics.getGender().keySet()) {
+                Integer amount = statistics.getGender().get(voterGender);
                 dataset.setValue(amount, "Gender", voterGender);
             }
         }
@@ -105,17 +107,17 @@ public class VotesViewerApp extends ApplicationFrame {
         return barChart;
     }
 
-    private CategoryDataset createAgeDataSet(Statistics statistics) {
+    private CategoryDataset createAgeDataSet(Stats statistics) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         Map<String, Integer> data = new LinkedHashMap<>();
 
         data.put("<20", 0);
 
-        if (statistics.getVoterAge() != null) {
+        if (statistics.getAge() != null) {
             int step = 10;
-            for (Integer voterAge : statistics.getVoterAge().keySet()) {
-                Integer amount = statistics.getVoterAge().get(voterAge);
+            for (Integer voterAge : statistics.getAge().keySet()) {
+                Integer amount = statistics.getAge().get(voterAge);
                 String categoryName;
                 if (voterAge < 20) {
                     categoryName = "<20";
@@ -149,11 +151,11 @@ public class VotesViewerApp extends ApplicationFrame {
         return chartPanel;
     }
 
-    private CategoryDataset createResidenceDataset(Statistics statistics) {
+    private CategoryDataset createResidenceDataset(Stats statistics) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        for (String residence : statistics.getVoterResidence().keySet()) {
-            Integer amount = statistics.getVoterResidence().get(residence);
+        for (String residence : statistics.getResidence().keySet()) {
+            Integer amount = statistics.getResidence().get(residence);
             dataset.addValue(amount, "Residence", residence);
         }
 
@@ -201,10 +203,12 @@ public class VotesViewerApp extends ApplicationFrame {
         setLocationByPlatform(true);
 
         chartsPanel = new JPanel();
-        GridLayout chartLayout = new GridLayout(0, 2);
-        chartsPanel.setLayout(chartLayout);
+        chartsLayout = new GridLayout(0, 1);
+        chartsPanel.setLayout(chartsLayout);
 
         getContentPane().add(chartsPanel, BorderLayout.CENTER);
+
+        setDefaultView();
 
     }
 
@@ -217,10 +221,13 @@ public class VotesViewerApp extends ApplicationFrame {
             File file = fileChooser.getSelectedFile();
             try {
 
+
+                chartsLayout.setColumns(2);
+                chartsLayout.setRows(2);
                 chartsPanel.removeAll();
                 pack();
 
-                Statistics statistics = readStatistics(file);
+                Stats statistics = readStatistics(file);
 
                 JPanel voteChartPanel = createVoteChartPanel(createVoteChart(createVotesDataSet(statistics)));
 
@@ -247,26 +254,74 @@ public class VotesViewerApp extends ApplicationFrame {
                         "Opening error",
                         JOptionPane.WARNING_MESSAGE);
                 e.printStackTrace();
+                setDefaultView();
             }
         } else {
             JOptionPane.showMessageDialog(this,
                     "File not selected",
                     "File not selected",
                     JOptionPane.WARNING_MESSAGE);
+            setDefaultView();
         }
 
     }
 
-    public Statistics readStatistics(File file) throws IOException {
+    private void setDefaultView() {
+        int width = getWidth();
+        int height = getHeight();
+        FlowLayout layout = new FlowLayout();
+        JPanel logoPanel = new JPanel();
+        logoPanel.setLayout(layout);
+        logoPanel.add(new JLabel("Open a stats.json file from the menu..."));
+        chartsLayout.setColumns(1);
+        chartsLayout.setRows(0);
+        chartsPanel.removeAll();
+        chartsPanel.add(logoPanel);
+        setSize(width, height);
+        pack();
+    }
+
+    public Stats readStatistics(File file) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
         objectMapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
-        return objectMapper.readValue(new FileInputStream(file), StatisticsImpl.class);
+        return objectMapper.readValue(new FileInputStream(file), Stats.class);
     }
 
     public static void main(String[] args) {
         VotesViewerApp app = new VotesViewerApp("Votes Viewer");
         app.setVisible(true);
+    }
+
+    private static class Stats {
+        private Map<String, Integer> votes = new HashMap<>();
+
+        private Map<Integer, Integer> age = new HashMap<>();
+
+        private Map<String, Integer> gender = new HashMap<>();
+
+        private Map<String, Integer> residence = new HashMap<>();
+
+
+        @JsonGetter("candidateVotes")
+        public Map<String, Integer> getVotes() {
+            return votes;
+        }
+
+        @JsonGetter("voterAge")
+        public Map<Integer, Integer> getAge() {
+            return age;
+        }
+
+        @JsonGetter("voterGender")
+        public Map<String, Integer> getGender() {
+            return gender;
+        }
+
+        @JsonGetter("voterResidence")
+        public Map<String, Integer> getResidence() {
+            return residence;
+        }
     }
 }
