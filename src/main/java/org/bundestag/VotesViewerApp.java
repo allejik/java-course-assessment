@@ -33,6 +33,8 @@ public class VotesViewerApp extends ApplicationFrame {
 
     private JPanel chartsPanel;
 
+    private GridLayout chartsLayout;
+
     /**
      * Constructs a new application frame.
      *
@@ -201,10 +203,12 @@ public class VotesViewerApp extends ApplicationFrame {
         setLocationByPlatform(true);
 
         chartsPanel = new JPanel();
-        GridLayout chartLayout = new GridLayout(0, 2);
-        chartsPanel.setLayout(chartLayout);
+        chartsLayout = new GridLayout(0, 1);
+        chartsPanel.setLayout(chartsLayout);
 
         getContentPane().add(chartsPanel, BorderLayout.CENTER);
+
+        setDefaultView();
 
     }
 
@@ -217,6 +221,9 @@ public class VotesViewerApp extends ApplicationFrame {
             File file = fileChooser.getSelectedFile();
             try {
 
+
+                chartsLayout.setColumns(2);
+                chartsLayout.setRows(2);
                 chartsPanel.removeAll();
                 pack();
 
@@ -247,14 +254,31 @@ public class VotesViewerApp extends ApplicationFrame {
                         "Opening error",
                         JOptionPane.WARNING_MESSAGE);
                 e.printStackTrace();
+                setDefaultView();
             }
         } else {
             JOptionPane.showMessageDialog(this,
                     "File not selected",
                     "File not selected",
                     JOptionPane.WARNING_MESSAGE);
+            setDefaultView();
         }
 
+    }
+
+    private void setDefaultView() {
+        int width = getWidth();
+        int height = getHeight();
+        FlowLayout layout = new FlowLayout();
+        JPanel logoPanel = new JPanel();
+        logoPanel.setLayout(layout);
+        logoPanel.add(new JLabel("Open a stats.json file from the menu..."));
+        chartsLayout.setColumns(1);
+        chartsLayout.setRows(0);
+        chartsPanel.removeAll();
+        chartsPanel.add(logoPanel);
+        setSize(width, height);
+        pack();
     }
 
     public Stats readStatistics(File file) throws IOException {
