@@ -34,5 +34,21 @@ class Voter {
     public String getResidence() {
         return residence;
     }
+
+    public void setCandidateName(String candidateName) {
+        this.candidateName = candidateName;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void setResidence(String residence) {
+        this.residence = residence;
+    }
 }
 
