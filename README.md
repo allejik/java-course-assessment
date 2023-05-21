@@ -11,5 +11,5 @@
 5. Создайте класс (например MyStatistics) который реализует интерфейс <b>Statistics</b> с помощью ключевого слова <b>implements</b> и установите в него ранее подсчитанные значения
 <br><br>
 6. Используйте следующий код для создания <b>stats.json</b> файла со статистикой:<br>
-<code>fileHelper.writeStatistics(<i>ОБЪЕКТ_СТАТИСТИКИ</i>);</code><br>
+<code>fileHelper.writeStatistics(<i>ОБЪЕКТ_СТАТИСТИКИ</i>);</code><br><br>
 7. Перейдите по ссылке http://java-course-assessment-check-app.s3-website.eu-central-1.amazonaws.com и поместите содержимое <b>stats.json</b> файла в поле для проверки ответа. 
